@@ -1,9 +1,16 @@
-from django.urls import path
-from .views import ProductList, AddToCart, ViewCart, Checkout
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from rest_framework.decorators import action
+from .product_views import ProductViewSet, CartItemViewSet, PaymentViewSet
+
+router = DefaultRouter()
+router.register(r'products', ProductViewSet)
+router.register(r'cart-items', CartItemViewSet)
+router.register(r'payments', PaymentViewSet, basename='payment')
 
 urlpatterns = [
-    path('products/', ProductList.as_view(), name='product-list'),
-    path('cart/add/', AddToCart.as_view(), name='add-to-cart'),
-    path('cart/view/', ViewCart.as_view(), name='view-cart'),
-    path('checkout/', Checkout.as_view(), name='checkout'),
+    path('', include(router.urls)),
+    path('payments/process/', PaymentViewSet.as_view({
+        'post': 'process_payment'
+    }), name='payment-process'),
 ]
